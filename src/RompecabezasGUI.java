@@ -1,39 +1,91 @@
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
-import java.util.Stack;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
 
-/**
- * Inteligencia Artifical
- * Resolucion de un rompecabezas 8 con busquedad ciega en anchura
- * Integrantes
- * Juan Carlos
- * Altair
- * Alan
- */
-public class BusquedadCiega {
+public class RompecabezasGUI extends JFrame {
+    private JTextArea outputTextArea;
+    private int[][] estadoInicial;
+    private int[][] estadoFinal;
 
-    public static void main(String[] args) {
-        // Declarar estados
-        // Estadi Inicial
-        int[][] estadoInicial = { { 4, 1, 3 },
+    public RompecabezasGUI() {
+        // Configurar la ventana
+        setTitle("Resolución de Rompecabezas 8-Puzzle");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Crear un panel para colocar componentes
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+        // Crear un área de texto para mostrar la salida
+        outputTextArea = new JTextArea();
+        outputTextArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(outputTextArea);
+
+        // Crear un botón para iniciar la búsqueda
+        JButton startButton = new JButton("Iniciar Búsqueda");
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Deshabilitar el botón mientras se ejecuta la búsqueda
+                startButton.setEnabled(false);
+
+                // Ejecutar la búsqueda en un hilo separado
+                SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
+                    @Override
+                    protected Void doInBackground() {
+                        // Coloca tu lógica de búsqueda aquí y publica resultados parciales
+                        publish("Comenzando la búsqueda...\n");
+
+                        // Ejemplo: Búsqueda ciega en anchura
+                        busquedaCiegaAnchura(estadoInicial, estadoFinal);
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void process(java.util.List<String> chunks) {
+                        // Actualizar el área de texto con resultados parciales
+                        for (String chunk : chunks) {
+                            outputTextArea.append(chunk);
+                        }
+                    }
+
+                    @Override
+                    protected void done() {
+                        // Habilitar el botón nuevamente cuando la búsqueda haya terminado
+                        startButton.setEnabled(true);
+                    }
+                };
+
+                worker.execute();
+            }
+        });
+
+        // Agregar componentes al panel
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(startButton, BorderLayout.SOUTH);
+
+        // Agregar el panel a la ventana
+        add(panel);
+
+        // Estado inicial y final del rompecabezas
+        estadoInicial = new int[][] {
+                { 4, 1, 3 },
                 { 0, 8, 5 },
                 { 2, 7, 6 }
         };
-        // Estado Final o meta
-        int[][] estadoFinal = { { 1, 2, 3 },
+
+        estadoFinal = new int[][] {
+                { 1, 2, 3 },
                 { 4, 5, 6 },
                 { 7, 8, 0 }
         };
-
-        BusquedadCiega solucion = new BusquedadCiega();
-        // buscar solucion
-        solucion.busquedad_ciega_anchura(estadoInicial, estadoFinal);
     }
 
-    public void busquedad_ciega_anchura(int[][] estadoInicial, int[][] estadoFinal) {
+    public void busquedaCiegaAnchura(int[][] estadoInicial, int[][] estadoFinal) {
         boolean encontro = false;// variable para declarar si encontro solucion
 
         // se declara el nodo current o actual y se almacena el estadoInicial
@@ -160,11 +212,20 @@ public class BusquedadCiega {
     public void imprimirMatriz(int[][] matriz) {
         for (int fila = 0; fila < matriz.length; fila++) {
             for (int columna = 0; columna < matriz[fila].length; columna++) {
-                System.out.print(matriz[fila][columna] + "  ");
+                outputTextArea.append(matriz[fila][columna] + "  ");
             }
-            System.out.println(" ");
+            outputTextArea.append("\n");
         }
-        System.out.println(" ");
+        outputTextArea.append("\n");
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                RompecabezasGUI gui = new RompecabezasGUI();
+                gui.setVisible(true);
+            }
+        });
     }
 }
 
