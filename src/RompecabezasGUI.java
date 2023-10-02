@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
@@ -15,9 +16,10 @@ public class RompecabezasGUI extends JFrame {
     private List<String> iteraciones; // Lista para almacenar las iteraciones
     private int currentIterationIndex; // Índice de la iteración actual
     private DefaultTableModel tableModel;
+    private JButton startButton; // Botón de inicio de búsqueda
+    private JButton reiniciarButton; // Botón de reinicio del puzzle
 
     public RompecabezasGUI() {
-        // Configurar la ventana
         setTitle("Resolución de Rompecabezas 8-Puzzle");
         setSize(800, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -37,9 +39,13 @@ public class RompecabezasGUI extends JFrame {
 
         // Agregar el JTable a un JScrollPane
         JScrollPane scrollPane = new JScrollPane(puzzleTable);
+        reiniciarButton = createReiniciarButton();
 
-        // Crear un botón para iniciar la búsqueda
-        JButton startButton = new JButton("Iniciar Búsqueda");
+        // Agregar componentes al panel
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        // Inicializar el botón de inicio aquí
+        startButton = new JButton("Iniciar Búsqueda");
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -55,6 +61,7 @@ public class RompecabezasGUI extends JFrame {
                         currentIterationIndex = 0;
                         // Ejemplo: Búsqueda ciega en anchura
                         busquedaCiegaAnchura(estadoInicial, estadoFinal);
+                        reiniciarButton.setEnabled(true);
                         return null;
                     }
                 };
@@ -63,9 +70,12 @@ public class RompecabezasGUI extends JFrame {
             }
         });
 
+        // Continuar con la adición de componentes
+        panel.add(startButton, BorderLayout.LINE_END);
+        panel.add(reiniciarButton, BorderLayout.PAGE_END);
+
         // Agregar componentes al panel
         panel.add(scrollPane, BorderLayout.CENTER);
-        panel.add(startButton, BorderLayout.SOUTH);
 
         // Agregar el panel a la ventana
         add(panel);
@@ -112,8 +122,6 @@ public class RompecabezasGUI extends JFrame {
                     }
                 }
 
-                // Agregar la iteración formateada a la lista
-                iteraciones.add(imprimirMatriz(actual.estado));
             }
         }
 
@@ -123,9 +131,14 @@ public class RompecabezasGUI extends JFrame {
                 solucion.push(hijo);
                 hijo = hijo.padre;
             }
+            while (!solucion.isEmpty()) {
+                actual = solucion.pop();// sacar elemento de la pila
+                // Agregar la iteración formateada a la lista
+                iteraciones.add(imprimirMatriz(actual.estado));
+            }
 
             // Usar un temporizador para mostrar las iteraciones con pausas
-            Timer timer = new Timer(500, new ActionListener() {
+            Timer timer = new Timer(2000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (currentIterationIndex < iteraciones.size()) {
@@ -142,6 +155,28 @@ public class RompecabezasGUI extends JFrame {
             // Si no se encontró una solución
             mostrarIteracion("No existe un camino para llegar del estado inicial al final");
         }
+    }
+
+    // Método para crear y configurar el botón de reinicio
+    private JButton createReiniciarButton() {
+        JButton button = new JButton("Reiniciar Puzzle");
+        button.setEnabled(false); // Desactivar el botón al inicio
+
+        // Agregar ActionListener para reiniciar el puzzle
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Restablecer la tabla con el estado inicial
+                updateTableModel(estadoInicial);
+
+                startButton.setEnabled(true);
+
+                // Desactivar el botón de reinicio
+                reiniciarButton.setEnabled(false);
+            }
+        });
+
+        return button;
     }
 
     public RompecabezasEstado movimientos(RompecabezasEstado estado, int mov) {
