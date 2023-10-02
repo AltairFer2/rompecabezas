@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.util.*;
 import java.util.Queue;
 import java.util.List;
+import javax.swing.table.DefaultTableCellRenderer;
 
 public class RompecabezasGUI extends JFrame {
     private JTable puzzleTable; // Usar JTable para mostrar la matriz
@@ -35,6 +36,14 @@ public class RompecabezasGUI extends JFrame {
         puzzleTable.setCellSelectionEnabled(false);
         puzzleTable.setRowHeight(50);
         puzzleTable.setFont(new Font("Arial", Font.PLAIN, 24));
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+
+        // Aplicar el renderizador a todas las columnas
+        for (int i = 0; i < puzzleTable.getColumnCount(); i++) {
+            puzzleTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
 
         // Agregar el JTable a un JScrollPane
         JScrollPane scrollPane = new JScrollPane(puzzleTable);
