@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
@@ -39,13 +38,24 @@ public class RompecabezasGUI extends JFrame {
 
         // Agregar el JTable a un JScrollPane
         JScrollPane scrollPane = new JScrollPane(puzzleTable);
+
+        // Crear un panel contenedor para la tabla y centrarlo
+        JPanel tableContainer = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        tableContainer.add(scrollPane); // Agrega la tabla al panel contenedor
+
+        // Agregar el panel contenedor en lugar de la tabla directamente al panel
+        // principal
+        panel.add(tableContainer, BorderLayout.CENTER);
+
         reiniciarButton = createReiniciarButton();
 
-        // Agregar componentes al panel
-        panel.add(scrollPane, BorderLayout.CENTER);
+        // Crear un panel para los botones
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.PAGE_AXIS));
 
         // Inicializar el botón de inicio aquí
         startButton = new JButton("Iniciar Búsqueda");
+        startButton.setAlignmentX(Component.CENTER_ALIGNMENT); // Centrar el botón horizontalmente
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -70,12 +80,18 @@ public class RompecabezasGUI extends JFrame {
             }
         });
 
-        // Continuar con la adición de componentes
-        panel.add(startButton, BorderLayout.LINE_END);
-        panel.add(reiniciarButton, BorderLayout.PAGE_END);
+        // Agregar el botón de reinicio al panel de botones
+        buttonPanel.add(startButton);
 
-        // Agregar componentes al panel
-        panel.add(scrollPane, BorderLayout.CENTER);
+        // Crear el botón de reinicio
+        reiniciarButton = createReiniciarButton();
+        reiniciarButton.setAlignmentX(Component.CENTER_ALIGNMENT); // Centrar el botón horizontalmente
+
+        // Agregar el botón de reinicio al panel de botones
+        buttonPanel.add(reiniciarButton);
+
+        // Agregar el panel de botones al panel principal
+        panel.add(buttonPanel, BorderLayout.PAGE_END);
 
         // Agregar el panel a la ventana
         add(panel);
@@ -337,5 +353,4 @@ class RompecabezasEstado {
     public String toString() {
         return Arrays.deepToString(estado);
     }
-
 }
